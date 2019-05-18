@@ -165,6 +165,7 @@ function removeOtherPlayer(data) {
 }
 
 function checkKeyStates(data) {
+    console.log('inputs', data.inputs);
     var playerMesh = playerForId(data.playerId) || player;
     if(playerMesh) {
         if (data.inputs[38] || data.inputs[90]) {
