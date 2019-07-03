@@ -84,6 +84,6 @@ io.on('connection', function(socket) {
 /**
  * STARTING SERVER
  */
-server.listen(5000, function() {
-	console.log('Starting server on port 5000');
+server.listen(8001, function() {
+	console.log('Starting server on port 8001');
 });
