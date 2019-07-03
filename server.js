@@ -10,7 +10,7 @@ var server = http.Server(app);
 var io = require('socket.io')(server);
 var world = require('./world');
 
-app.set('port', 5000);
+app.set('port', 8001);
 app.use('/public', express.static(__dirname + '/public'));
 
 /**
