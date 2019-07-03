@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "node server.js",
+    "live": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -14,5 +15,8 @@
     "nodemon": "^1.18.7",
     "socket.io": "^2.1.1",
     "three": "^0.98.0"
+  },
+  "engines": {
+    "node": "8.11.3" 
   }
 }
