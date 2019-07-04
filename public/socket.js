@@ -18,7 +18,6 @@ socket.on('addOtherPlayer', function (data) {
     addOtherPlayer(data);
 });
 socket.on('updatePosition', function (data) {
-    console.log('return', data);
     updatePlayerPosition(data);
 });
 socket.on('inputAction', function(data) {

@@ -60,7 +60,6 @@ io.on('connection', function(socket) {
 	});
 	
 	socket.on('playerAtk', function (data) {
-		console.log(data);
 		io.emit('playerAttack', data);
 	});
 

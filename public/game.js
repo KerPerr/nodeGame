@@ -209,9 +209,26 @@ function playerCollision() {
 
 function addOtherPlayer(data) {
     var otherPlayer = new THREE.Mesh(
-        new THREE.BoxGeometry(data.size.x, data.size.y, data.size.z),
+        new THREE.BoxGeometry(data.sizeX, data.sizeY, data.sizeZ),
         new THREE.MeshLambertMaterial({ color: 0x7777ff })
     );
+    var rightChild = new THREE.Mesh(
+        new THREE.BoxGeometry(0.25, 0.25, 0.25),
+        new THREE.MeshLambertMaterial({ color: 0x7777ff })
+    );
+    rightChild.position.set(.5, 0, 0);
+    rightChild.name = 'right';
+    var leftChild = new THREE.Mesh(
+        new THREE.BoxGeometry(0.25, 0.25, 0.25),
+        new THREE.MeshLambertMaterial({ color: 0x7777ff })
+    );
+    leftChild.position.set(-.5, 0, 0);
+
+    otherPlayer.add(leftChild);
+    otherPlayer.add(rightChild);
+
+    leftChild.castShadow = true;
+    rightChild.castShadow = true;
 
     otherPlayer.castShadow = true;
     otherPlayer.receiveShadow = true;
@@ -231,12 +248,16 @@ function addOtherPlayer(data) {
 
     otherPlayersId.push(data.playerId);
     otherPlayers.push(otherPlayer);
+    colliders.push(otherPlayer);
     scene.add(otherPlayer);
 }
 
 function removeOtherPlayer(data) {
     scene.remove(playerForId(data.playerId));
-
+    
+    var i = colliders.indexOf(playerForId(data.playerId));
+    if (i != -1)
+        colliders.splice(i, 1);
     var j = otherPlayers.indexOf(playerForId(data.playerId));
     if (j != -1)
         otherPlayers.splice(j, 1);
@@ -338,10 +359,9 @@ function checkKeyStates() {
 function playerAttack(data) {
     console.log(data);
     var hit = [];
-    var somePlayer = playerForId(data.playerId) || player;
+    var somePlayer = playerForId(data.playerId);
     if (canHit) {
         canHit = false;
-
         var tween = new TWEEN.Tween(somePlayer.children[1].position)
             .to({ x: 0.3, y: 0, z: -1 }, 200)
             .easing(TWEEN.Easing.Sinusoidal.Out);
@@ -371,7 +391,7 @@ var attackCollision = function (weapon) {
         // And disable that direction if we do
         let target = collisions.find(o => o.object.name == 'others');
         if (target && target.distance <= distance) {
-            console.log('Hited', playerForId(target.id))    ;
+            console.log('Hited', target);
             socket.emit('AttackHit', target);
             return true;
         }
@@ -411,7 +431,6 @@ function updatePlayerData() {
 function updatePlayerPosition(data) {
     var somePlayer = playerForId(data.playerId);
     if (somePlayer) {
-        console.log('UPDATE', somePlayer);
         somePlayer.rotation.set(
             data.rotation.x,
             data.rotation.y,
