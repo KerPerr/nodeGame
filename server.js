@@ -58,10 +58,10 @@ io.on('connection', function(socket) {
 			JSON.parse(fs.readFileSync('./data/map.base.json'))
 		);
 	});
-
-	socket.on('input', function(data, press) {
-		player.inputs[data] = press;
-		socket.emit('inputAction', player);
+	
+	socket.on('playerAtk', function (data) {
+		console.log(data);
+		io.emit('playerAttack', data);
 	});
 
 	socket.on('updatePosition', function(data) {

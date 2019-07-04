@@ -17,20 +17,16 @@ socket.on('createPlayer', function (data) {
 socket.on('addOtherPlayer', function (data) {
     addOtherPlayer(data);
 });
+socket.on('updatePosition', function (data) {
+    console.log('return', data);
+    updatePlayerPosition(data);
+});
 socket.on('inputAction', function(data) {
     checkKeyStates(data);
+});
+socket.on('playerAttack', function (data) {
+    playerAttack(data);
 });
 socket.on('removeOtherPlayer', function (data) {
     removeOtherPlayer(data);
 });
-
-/**
- * EventListeners
- */
-document.addEventListener('keydown', function(event) {
-    socket.emit('input', event.keyCode, true);
-});
-document.addEventListener('keyup', function(event) {
-    socket.emit('input', event.keyCode, false);
-});
-window.addEventListener('resize', onWindowResize, false);

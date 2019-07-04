@@ -2,6 +2,7 @@
 	<head>
 		<title>A Multiplayer Game</title>
 		<script src="//threejs.org/build/three.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/17.4.0/Tween.min.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
 	</head>
 	<body style="margin: 0">
@@ -12,6 +13,18 @@
 	<script src="/public/math.js"></script>
 	<script src="/public/game.js"></script>
 	<script src="/public/socket.js"></script>
+
+	<!-- EventListeners -->
+	<script>
+		document.addEventListener('contextmenu', event => event.preventDefault());
+		document.addEventListener('keydown', onKeyDown, false);
+		document.addEventListener('keyup', onKeyUp, false);
+		window.addEventListener('resize', onWindowResize, false);
+		document.addEventListener('mousedown', onMouseDown, false);
+		document.addEventListener('mouseup', onMouseUp, false);
+		document.addEventListener('mousemove', onMouseMove, false);
+		document.addEventListener('mouseout', onMouseOut, false);
+	</script>
 
 	<!--LIBRARY-->
 	<script src="/public/lib/MTLLoader.js"></script>
