@@ -10,8 +10,8 @@ var server = http.Server(app);
 var io = require('socket.io')(server);
 var world = require('./world');
 
-const port = process.env.PORT || 3000
-//app.set('port', 8001);
+const port = process.env.PORT || 8080;
+app.set('port', port);
 app.use('/public', express.static(__dirname + '/public'));
 
 /**
