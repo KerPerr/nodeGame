@@ -10,7 +10,8 @@ var server = http.Server(app);
 var io = require('socket.io')(server);
 var world = require('./world');
 
-app.set('port', 8001);
+const port = process.env.PORT || 3000
+//app.set('port', 8001);
 app.use('/public', express.static(__dirname + '/public'));
 
 /**
@@ -84,6 +85,6 @@ io.on('connection', function(socket) {
 /**
  * STARTING SERVER
  */
-server.listen(8001, function() {
-	console.log('Starting server on port 8001');
+server.listen(port, function() {
+	console.log('Starting server on port ' + port);
 });
