@@ -2,7 +2,7 @@ var stats, scene, clock, timeElapsed, camera;
 var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 
 var models = [], objects = [];
-var player, playerId, otherPlayers = [], otherPlayersId = [], colliders = [];
+var player, playersArray = [], idsArray = [], colliders = [];
 var keyState = {};
 var rays = [
     new THREE.Vector3(0, 0, 1),
@@ -99,7 +99,7 @@ function loadModels(data) {
 }
 
 function createWorld(data) {
-    otherPlayers = [], otherPlayersId = [], colliders = [];
+    console.log('CREATE WORLD');
     data.map((m) => {
         let elem = objects.find(e => e.name == m.path).clone();
         elem.position.set(m.position.x, m.position.y, m.position.z);
@@ -115,54 +115,58 @@ function createWorld(data) {
 }
 
 function createPlayer(data) {
+    console.log('CREATE PLAYER');
     playerData = data;
-    
-        player = new THREE.Mesh(
-            new THREE.BoxGeometry(data.sizeX, data.sizeY, data.sizeZ),
-            new THREE.MeshLambertMaterial({ color: 0x7777ff })
-        );
-        rightHand = new THREE.Mesh(
-            new THREE.BoxGeometry(0.25, 0.25, 0.25),
-            new THREE.MeshLambertMaterial({ color: 0x7777ff })
-        );
-        leftHand = new THREE.Mesh(
-            new THREE.BoxGeometry(0.25, 0.25, 0.25),
-            new THREE.MeshLambertMaterial({ color: 0x7777ff })
-        );
-    
-        rightHand.position.set(.5, 0, 0);
-        leftHand.position.set(-.5, 0, 0);
-        rightHand.name = 'right';
-        leftHand.name = 'left';
-        leftHand.castShadow = true;
-        rightHand.castShadow = true;
-        player.add(leftHand);
-        player.add(rightHand);
-    
-        player.name = 'player';
-        player.castShadow = true;
-        player.receiveShadow = true;
-    
-        player.rotation.set(
-            data.rotation.x,
-            data.rotation.y,
-            data.rotation.z
-        );
-    
-        player.position.set(
-            data.position.x,
-            data.position.y,
-            data.position.z
-        );
-    
-        playerId = data.playerId;
-        moveSpeed = data.stats.speed;
-    
-        updateCameraPosition();
-    
-        scene.add(player);
-    
-        camera.lookAt(player.position);
+
+    player = new THREE.Mesh(
+        new THREE.BoxGeometry(data.sizeX, data.sizeY, data.sizeZ),
+        new THREE.MeshLambertMaterial({ color: 0x7777ff })
+    );
+    rightHand = new THREE.Mesh(
+        new THREE.BoxGeometry(0.25, 0.25, 0.25),
+        new THREE.MeshLambertMaterial({ color: 0x7777ff })
+    );
+    leftHand = new THREE.Mesh(
+        new THREE.BoxGeometry(0.25, 0.25, 0.25),
+        new THREE.MeshLambertMaterial({ color: 0x7777ff })
+    );
+
+    rightHand.position.set(.5, 0, 0);
+    leftHand.position.set(-.5, 0, 0);
+    rightHand.name = 'right';
+    leftHand.name = 'left';
+    leftHand.castShadow = true;
+    rightHand.castShadow = true;
+    player.add(leftHand);
+    player.add(rightHand);
+
+    player.name = 'player';
+    player.castShadow = true;
+    player.receiveShadow = true;
+
+    player.rotation.set(
+        data.rotation.x,
+        data.rotation.y,
+        data.rotation.z
+    );
+
+    player.position.set(
+        data.position.x,
+        data.position.y,
+        data.position.z
+    );
+
+    playerId = data.playerId;
+    idsArray.push(data.playerId);
+    playersArray.push(player);
+    moveSpeed = data.stats.speed;
+    //colliders.push(player);
+
+    updateCameraPosition();
+
+    scene.add(player);
+
+    camera.lookAt(player.position);
 }
 
 function playerCollision() {
@@ -246,8 +250,8 @@ function addOtherPlayer(data) {
         data.position.z
     );
 
-    otherPlayersId.push(data.playerId);
-    otherPlayers.push(otherPlayer);
+    idsArray.push(data.playerId);
+    playersArray.push(otherPlayer);
     colliders.push(otherPlayer);
     scene.add(otherPlayer);
 }
@@ -258,12 +262,12 @@ function removeOtherPlayer(data) {
     var i = colliders.indexOf(playerForId(data.playerId));
     if (i != -1)
         colliders.splice(i, 1);
-    var j = otherPlayers.indexOf(playerForId(data.playerId));
+    var j = playersArray.indexOf(playerForId(data.playerId));
     if (j != -1)
-        otherPlayers.splice(j, 1);
-    var k = otherPlayersId.indexOf(data.playerId);
+        playersArray.splice(j, 1);
+    var k = idsArray.indexOf(data.playerId);
     if (k != -1)
-        otherPlayersId.splice(k, 1);
+        idsArray.splice(k, 1);
 }
 
 function onMouseUp() {}
@@ -297,6 +301,8 @@ function onMouseDown() {
             break;
     }
 }
+
+function onMouseOut() {}
 
 function onMouseMove() {
     if (player) {
@@ -357,10 +363,9 @@ function checkKeyStates() {
 }
 
 function playerAttack(data) {
-    console.log(data);
     var hit = [];
     var somePlayer = playerForId(data.playerId);
-    if (canHit) {
+    if (canHit && somePlayer) {
         canHit = false;
         var tween = new TWEEN.Tween(somePlayer.children[1].position)
             .to({ x: 0.3, y: 0, z: -1 }, 200)
@@ -455,13 +460,13 @@ function updateCameraPosition() {
 
 function playerForId(id) {
     var index;
-    for (var i = 0; i < otherPlayersId.length; i++) {
-        if (otherPlayersId[i] == id) {
+    for (var i = 0; i < idsArray.length; i++) {
+        if (idsArray[i] == id) {
             index = i;
             break;
         }
     }
-    return otherPlayers[index];
+    return playersArray[index];
 };
 
 function onWindowResize() {
