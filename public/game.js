@@ -2,7 +2,7 @@ var stats, scene, clock, timeElapsed, camera;
 var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 
 var models = [], objects = [];
-var player, playersArray = [], idsArray = [], colliders = [];
+var player, playerId, playersArray = [], idsArray = [], colliders = [];
 var keyState = {};
 var rays = [
     new THREE.Vector3(0, 0, 1),
@@ -63,7 +63,6 @@ function createLights() {
 }
 
 function loadModels(data) {
-    console.log('LOAD MODELS');
     var manager = new THREE.LoadingManager();
 
     for (let i = 0; i < data.length; i++) {
@@ -99,7 +98,6 @@ function loadModels(data) {
 }
 
 function createWorld(data) {
-    console.log('CREATE WORLD');
     data.map((m) => {
         let elem = objects.find(e => e.name == m.path).clone();
         elem.position.set(m.position.x, m.position.y, m.position.z);
@@ -115,7 +113,6 @@ function createWorld(data) {
 }
 
 function createPlayer(data) {
-    console.log('CREATE PLAYER');
     playerData = data;
 
     player = new THREE.Mesh(
@@ -212,7 +209,6 @@ function playerCollision() {
 };
 
 function addOtherPlayer(data) {
-    console.log('CREATE OTHER');
     var otherPlayer = new THREE.Mesh(
         new THREE.BoxGeometry(data.sizeX, data.sizeY, data.sizeZ),
         new THREE.MeshLambertMaterial({ color: 0x7777ff })
@@ -258,7 +254,6 @@ function addOtherPlayer(data) {
 }
 
 function removeOtherPlayer(data) {
-    console.log('REMOVE PLAYER');
     scene.remove(playerForId(data.playerId));
     
     var i = colliders.indexOf(playerForId(data.playerId));
@@ -341,27 +336,24 @@ function checkKeyStates() {
     if (keyState[38] || keyState[90]) {
         // up arrow or 'w' - move forward
         player.position.z -= moveSpeed * timeElapsed;
-        updatePlayerData();
         updateCameraPosition();
     }
     if (keyState[40] || keyState[83]) {
         // down arrow or 's' - move backward
         player.position.z += moveSpeed * timeElapsed;
-        updatePlayerData();
         updateCameraPosition();
     }
     if (keyState[81] || keyState[37]) {
         // left arrow or 'q' - strafe left
         player.position.x -= moveSpeed * timeElapsed;
-        updatePlayerData();
         updateCameraPosition();
     }
     if (keyState[68] || keyState[39]) {
         // right arrow or 'd' - strage right
         player.position.x += moveSpeed * timeElapsed;
-        updatePlayerData();
         updateCameraPosition();
     }
+    updatePlayerData();
 }
 
 function playerAttack(data) {
@@ -418,14 +410,15 @@ function calculateIntersects(event) {
 }
 
 function updatePlayerData() {
-    let mesh = playerForId(playerId);
-    let data = {
-        'playerId': playerId,
-        'position': { 'x':mesh.position.x, 'y':mesh.position.y, 'z':mesh.position.z },
-        'rotation': { 'x':mesh.rotation.x, 'y':mesh.rotation.y, 'z':mesh.rotation.z }
-    };
-
-    socket.emit('updatePosition', data);
+    if(playerId) {
+        let mesh = playerForId(playerId);
+        let data = {
+            'playerId': playerId,
+            'position': { 'x':mesh.position.x, 'y':mesh.position.y, 'z':mesh.position.z },
+            'rotation': { 'x':mesh.rotation.x, 'y':mesh.rotation.y, 'z':mesh.rotation.z }
+        };
+        socket.emit('updatePosition', data);
+    }
 }
 
 function updatePlayerPosition(data) {

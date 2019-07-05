@@ -64,20 +64,16 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('updatePosition', function(data) {
-        var newData = world.updatePlayerData(data);
+		var newData = world.updatePlayerData(data);
+		console.log('NEW DATA', newData.position);
         socket.broadcast.emit('updatePosition', newData);
 	});
-	/*
-	let interval = setInterval(() => {
-		io.emit('inputAction', player)
-	}, 25)
-	*/
+	
 	socket.on('disconnect', function () {
 		console.log('Goodbye ' + socket.id);
 		// sending to all clients in 'game' room, including sender
 		io.emit('removeOtherPlayer', player);
 		world.removePlayer(player);
-		//clearInterval(interval);
 	});
 });
 
