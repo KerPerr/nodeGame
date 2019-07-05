@@ -63,7 +63,7 @@ function createLights() {
 }
 
 function loadModels(data) {
-
+    console.log('LOAD MODELS');
     var manager = new THREE.LoadingManager();
 
     for (let i = 0; i < data.length; i++) {
@@ -212,6 +212,7 @@ function playerCollision() {
 };
 
 function addOtherPlayer(data) {
+    console.log('CREATE OTHER');
     var otherPlayer = new THREE.Mesh(
         new THREE.BoxGeometry(data.sizeX, data.sizeY, data.sizeZ),
         new THREE.MeshLambertMaterial({ color: 0x7777ff })
@@ -257,6 +258,7 @@ function addOtherPlayer(data) {
 }
 
 function removeOtherPlayer(data) {
+    console.log('REMOVE PLAYER');
     scene.remove(playerForId(data.playerId));
     
     var i = colliders.indexOf(playerForId(data.playerId));
@@ -416,18 +418,11 @@ function calculateIntersects(event) {
 }
 
 function updatePlayerData() {
+    let mesh = playerForId(playerId);
     let data = {
         'playerId': playerId,
-        'position': {
-            'x': player.position.x,
-            'y': player.position.y,
-            'z': player.position.z
-        },
-        'rotation': {
-            'x': player.rotation.x,
-            'y': player.rotation.y,
-            'z': player.rotation.z
-        }
+        'position': { 'x':mesh.position.x, 'y':mesh.position.y, 'z':mesh.position.z },
+        'rotation': { 'x':mesh.rotation.x, 'y':mesh.rotation.y, 'z':mesh.rotation.z }
     };
 
     socket.emit('updatePosition', data);
