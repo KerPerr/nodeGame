@@ -26,7 +26,7 @@ app.get('/', function(request, response) {
  */
 io.on('connection', function(socket) {
 
-	console.log('PROCESS', process.env);
+	console.log('PROCESS', process.env.DYNO);
 	console.log("Welcome " + socket.id);
 
 	socket.emit(
