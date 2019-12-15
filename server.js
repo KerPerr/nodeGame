@@ -18,6 +18,7 @@ app.use('/public', express.static(__dirname + '/public'));
  * ROUTING
  */
 app.get('/', function(request, response) {
+	console.log('PROC', process.env.DYNO);
 	response.sendFile(path.join(__dirname, 'index.html'));
 });
 
