@@ -11,7 +11,6 @@ var io = require('socket.io')(server);
 var world = require('./world');
 
 const port = process.env.PORT || 8080;
-console.log('PROCESS', process.env);
 app.set('port', port);
 app.use('/public', express.static(__dirname + '/public'));
 
@@ -27,6 +26,7 @@ app.get('/', function(request, response) {
  */
 io.on('connection', function(socket) {
 
+	console.log('PROCESS', process.env);
 	console.log("Welcome " + socket.id);
 
 	socket.emit(
