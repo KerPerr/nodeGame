@@ -11,6 +11,7 @@ var io = require('socket.io')(server);
 var world = require('./world');
 
 const port = process.env.PORT || 8080;
+console.log('PROCESS', process.env);
 app.set('port', port);
 app.use('/public', express.static(__dirname + '/public'));
 
@@ -49,7 +50,7 @@ io.on('connection', function(socket) {
             if (world.players[i].playerId != id) {
 				socket.emit('addOtherPlayer', world.players[i]);
 			}
-        }
+		}
 	});
 	
 	socket.on('loadComplete', function() {
@@ -65,7 +66,6 @@ io.on('connection', function(socket) {
 
 	socket.on('updatePosition', function(data) {
 		var newData = world.updatePlayerData(data);
-		console.log('NEW DATA', newData.position);
         socket.broadcast.emit('updatePosition', newData);
 	});
 	

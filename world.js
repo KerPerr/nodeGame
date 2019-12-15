@@ -80,7 +80,6 @@ var updatePlayerData = function (data) {
 };  
 
 var playerForId = function (id) {
-    console.log('ID:', id);
     var player;
     for (var i = 0; i < players.length; i++) {
         if (players[i].playerId === id) {
@@ -88,7 +87,6 @@ var playerForId = function (id) {
             break;
         }
     }
-    console.log('RETURN', player);
     return player;
 };
 

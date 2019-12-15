@@ -113,45 +113,7 @@ function createWorld(data) {
 }
 
 function createPlayer(data) {
-    playerData = data;
-
-    player = new THREE.Mesh(
-        new THREE.BoxGeometry(data.sizeX, data.sizeY, data.sizeZ),
-        new THREE.MeshLambertMaterial({ color: 0x7777ff })
-    );
-    rightHand = new THREE.Mesh(
-        new THREE.BoxGeometry(0.25, 0.25, 0.25),
-        new THREE.MeshLambertMaterial({ color: 0x7777ff })
-    );
-    leftHand = new THREE.Mesh(
-        new THREE.BoxGeometry(0.25, 0.25, 0.25),
-        new THREE.MeshLambertMaterial({ color: 0x7777ff })
-    );
-
-    rightHand.position.set(.5, 0, 0);
-    leftHand.position.set(-.5, 0, 0);
-    rightHand.name = 'right';
-    leftHand.name = 'left';
-    leftHand.castShadow = true;
-    rightHand.castShadow = true;
-    player.add(leftHand);
-    player.add(rightHand);
-
-    player.name = 'player';
-    player.castShadow = true;
-    player.receiveShadow = true;
-
-    player.rotation.set(
-        data.rotation.x,
-        data.rotation.y,
-        data.rotation.z
-    );
-
-    player.position.set(
-        data.position.x,
-        data.position.y,
-        data.position.z
-    );
+    player = new Player(data);
 
     playerId = data.playerId;
     idsArray.push(data.playerId);
@@ -165,48 +127,6 @@ function createPlayer(data) {
 
     camera.lookAt(player.position);
 }
-
-function playerCollision() {
-    if(player) {
-        var collisions, i, distance = .75;
-        // For each ray
-        for (i = 0; i < rays.length; i += 1) {
-            // We reset the raycaster to this direction
-            caster.set(player.position, rays[i]);
-            // Test if we intersect with any obstacle mesh
-            collisions = caster.intersectObjects(colliders, true);
-            // And disable that direction if we do
-            if (collisions.length > 0 && collisions[0].distance <= distance) {
-                // Yep, this.rays[i] gives us : 0 => up, 1 => up-left, 2 => left, ...
-                if (i === 0 || i === 1 || i === 7) {
-                    player.position.z = collisions[0].point.z - distance;
-                    updatePlayerData();
-                    socket.emit('updatePosition', playerData);
-                }
-                if (i === 4 || i === 3 || i === 5) {
-                    player.position.z = collisions[0].point.z + distance;
-                    updatePlayerData();
-                    socket.emit('updatePosition', playerData);
-                }
-                if (i === 2 || i === 1 || i === 3) {
-                    player.position.x = collisions[0].point.x - distance;
-                    updatePlayerData();
-                    socket.emit('updatePosition', playerData);
-                }
-                if (i === 6 || i === 5 || i === 7) {
-                    player.position.x = collisions[0].point.x + distance;
-                    updatePlayerData();
-                    socket.emit('updatePosition', playerData);
-                }
-                if (i === 8) {
-                    player.position.y = collisions[0].point.y + 0.5;
-                    updatePlayerData();
-                    socket.emit('updatePosition', playerData);
-                }
-            }
-        }
-    }
-};
 
 function addOtherPlayer(data) {
     var otherPlayer = new THREE.Mesh(
@@ -317,43 +237,9 @@ function onMouseMove() {
         let diffZ = pos.z - player.position.z;
         let angle = Math.atan2(diffZ, diffX);
         player.rotation.y = -(angle + Math.PI / 2);
-        updatePlayerData();
-        socket.emit('updatePosition', playerData);
+        player.updatePlayerData();
+        socket.emit('updatePosition', player.playerData);
     }
-}
-
-function onKeyDown(event) {
-    //event = event || window.event;
-    keyState[event.keyCode || event.which] = true;
-}
-
-function onKeyUp(event) {
-    //event = event || window.event;
-    keyState[event.keyCode || event.which] = false;
-}
-
-function checkKeyStates() {
-    if (keyState[38] || keyState[90]) {
-        // up arrow or 'w' - move forward
-        player.position.z -= moveSpeed * timeElapsed;
-        updateCameraPosition();
-    }
-    if (keyState[40] || keyState[83]) {
-        // down arrow or 's' - move backward
-        player.position.z += moveSpeed * timeElapsed;
-        updateCameraPosition();
-    }
-    if (keyState[81] || keyState[37]) {
-        // left arrow or 'q' - strafe left
-        player.position.x -= moveSpeed * timeElapsed;
-        updateCameraPosition();
-    }
-    if (keyState[68] || keyState[39]) {
-        // right arrow or 'd' - strage right
-        player.position.x += moveSpeed * timeElapsed;
-        updateCameraPosition();
-    }
-    updatePlayerData();
 }
 
 function playerAttack(data) {
@@ -409,18 +295,6 @@ function calculateIntersects(event) {
     return intersects;
 }
 
-function updatePlayerData() {
-    if(playerId) {
-        let mesh = playerForId(playerId);
-        let data = {
-            'playerId': playerId,
-            'position': { 'x':mesh.position.x, 'y':mesh.position.y, 'z':mesh.position.z },
-            'rotation': { 'x':mesh.rotation.x, 'y':mesh.rotation.y, 'z':mesh.rotation.z }
-        };
-        socket.emit('updatePosition', data);
-    }
-}
-
 function updatePlayerPosition(data) {
     var somePlayer = playerForId(data.playerId);
     if (somePlayer) {
@@ -465,9 +339,12 @@ function onWindowResize() {
 
 function gameLoop() {
     TWEEN.update();
-    checkKeyStates();
-    playerCollision();
     timeElapsed = clock.getDelta();
     renderer.render(scene, camera);
+    if(player) {
+        player.update(timeElapsed);
+        player.Collision(colliders);
+        updateCameraPosition();
+    }
     requestAnimationFrame(gameLoop);
 }
