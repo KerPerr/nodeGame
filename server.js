@@ -19,6 +19,11 @@ app.use('/public', express.static(__dirname + '/public'));
  */
 app.get('/', function(request, response) {
 	console.log('PROC', process.env.DYNO);
+	new Promise(function(resolve, reject) {
+		setTimeout(function() {
+		  resolve('foo');
+		}, 10000);
+	  });
 	response.sendFile(path.join(__dirname, 'index.html'));
 });
 
