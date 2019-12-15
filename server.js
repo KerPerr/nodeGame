@@ -19,11 +19,7 @@ app.use('/public', express.static(__dirname + '/public'));
  */
 app.get('/', function(request, response) {
 	console.log('PROC', process.env.DYNO);
-	new Promise(function(resolve, reject) {
-		setTimeout(function() {
-		  resolve('foo');
-		}, 10000);
-	  });
+	mySlowFunction(8); // higher number => more iterations => slower
 	response.sendFile(path.join(__dirname, 'index.html'));
 });
 
@@ -89,3 +85,12 @@ io.on('connection', function(socket) {
 server.listen(port, function() {
 	console.log('Starting server on port ' + port);
 });
+
+function mySlowFunction(baseNumber) {
+	console.time('mySlowFunction');
+	let result = 0;	
+	for (var i = Math.pow(baseNumber, 7); i >= 0; i--) {		
+		result += Math.atan(i) * Math.tan(i);
+	};
+	console.timeEnd('mySlowFunction');
+}
