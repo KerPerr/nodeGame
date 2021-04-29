@@ -4,6 +4,7 @@
 var players = [];
 
 class Player {
+
     constructor() {
         this.playerId = players.length;
         this.username = null;
@@ -32,15 +33,8 @@ class Player {
 
         // STATS
         this.stats = {
-            speed: 3,
-            health: 10,
-            maxHealth: 10,
-            mana: 10,
-            maxMana: 10,
-            atkSpeed: 200
+            speed: 10
         }
-
-        this.inputs = []
     }
 
     setPosition(x, y, z) {

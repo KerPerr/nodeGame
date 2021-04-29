@@ -4,18 +4,6 @@ var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 var models = [], objects = [];
 var player, playerId, playersArray = [], idsArray = [], colliders = [];
 var keyState = {};
-var rays = [
-    new THREE.Vector3(0, 0, 1),
-    new THREE.Vector3(1, 0, 1),
-    new THREE.Vector3(1, 0, 0),
-    new THREE.Vector3(1, 0, -1),
-    new THREE.Vector3(0, 0, -1),
-    new THREE.Vector3(-1, 0, -1),
-    new THREE.Vector3(-1, 0, 0),
-    new THREE.Vector3(-1, 0, 1),
-    new THREE.Vector3(0, -1, 0)
-];
-var caster = new THREE.Raycaster();
 var canHit = true;
 
 createScene();
@@ -113,6 +101,7 @@ function createWorld(data) {
 }
 
 function createPlayer(data) {
+    console.log('data', data)
     player = new Player(data);
 
     playerId = data.playerId;
@@ -195,7 +184,6 @@ function onMouseDown() {
     switch (event.button) {
         case 0:
             console.log('Primary');
-            socket.emit('playerAtk', playerData);
             break;
         case 1:
             console.log('Roll');
@@ -343,7 +331,7 @@ function gameLoop() {
     renderer.render(scene, camera);
     if(player) {
         player.update(timeElapsed);
-        player.Collision(colliders);
+        //player.Collision(colliders);
         updateCameraPosition();
     }
     requestAnimationFrame(gameLoop);
